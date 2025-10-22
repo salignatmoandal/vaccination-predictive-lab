@@ -24,10 +24,10 @@ Réconciliation: garantir que la somme régionale = national, et somme départem
 
 | Axe                    | Description                                     | Output attendu                             |
 | ---------------------- | ----------------------------------------------- | ------------------------------------------ |
-| 🧬 **Prédiction**      | Estimer la demande vaccinale future par région  | Modèle prédictif ML (Prophet / XGBoost)    |
-| 🚚 **Distribution**    | Recommander une répartition optimale des stocks | Simulation logistique (ratio besoin/stock) |
-| 🏥 **Accès aux soins** | Identifier les zones sous-couvertes             | Heatmap géographique (carte France)        |
-| 📊 **Analyse**         | Explorer corrélations multi-facteurs            | Dashboard interactif                       |
+|  **Prédiction**      | Estimer la demande vaccinale future par région  | Modèle prédictif ML (Prophet / XGBoost)    |
+|  **Distribution**    | Recommander une répartition optimale des stocks | Simulation logistique (ratio besoin/stock) |
+|  **Accès aux soins** | Identifier les zones sous-couvertes             | Heatmap géographique (carte France)        |
+|  **Analyse**         | Explorer corrélations multi-facteurs            | Dashboard interactif                       |
 
 
 ### **1.Données**
@@ -59,10 +59,10 @@ Sources principales (open data) :
 
 | Agent                | Rôle                                 | Données                      | Exemple de sortie                         |
 | -------------------- | ------------------------------------ | ---------------------------- | ----------------------------------------- |
-| 🦠 **EpiAgent**      | Analyse les signaux épidémiques      | IAS®, Urgences, SOS Médecins | “Hausse de 25 % des cas grippe en IDF”    |
-| 🌦 **WeatherAgent**  | Évalue l’impact climatique           | Température, humidité        | “Semaine froide → transmission favorisée” |
-| 👥 **SocioAgent**    | Mesure la vulnérabilité territoriale | INSEE, DREES                 | “65 % population à risque non vaccinée”   |
-| 🚚 **LogisticAgent** | Observe la distribution vaccinale    | IQVIA, ARS                   | “Rupture potentielle en région PACA”      |
+|  **EpiAgent**      | Analyse les signaux épidémiques      | IAS®, Urgences, SOS Médecins | “Hausse de 25 % des cas grippe en IDF”    |
+|  **WeatherAgent**  | Évalue l’impact climatique           | Température, humidité        | “Semaine froide → transmission favorisée” |
+|  **SocioAgent**    | Mesure la vulnérabilité territoriale | INSEE, DREES                 | “65 % population à risque non vaccinée”   |
+|  **LogisticAgent** | Observe la distribution vaccinale    | IQVIA, ARS                   | “Rupture potentielle en région PACA”      |
 
 Ces agents **évaluent localement** leurs variables, puis **échangent leurs signaux** via un protocole **A2A (Agent-to-Agent)** :
 
