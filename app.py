@@ -3,12 +3,15 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+import seaborn as sns
 from datetime import datetime, timedelta
 import requests
 
 st.set_page_config(page_title="HeatMap Vaccination France", layout="wide")
 
-st.title(" HeatMap Vaccination Grippe - France")
+st.title("🗺️ HeatMap Vaccination Grippe - France")
 st.markdown("*Analyse des besoins en vaccins antigrippaux par région*")
 
 # ---------------------------
@@ -281,6 +284,272 @@ if not df_map.empty:
     fig_bar.update_layout(height=500)
     st.plotly_chart(fig_bar, use_container_width=True)
 
+    # ---------------------------
+    # Section Graphiques (à ajouter après la carte)
+    # ---------------------------
+
+    st.markdown("---")
+    st.subheader("📊 Analyses et Visualisations")
+
+    # Onglets pour différents types de graphiques
+    tab1, tab2, tab3, tab4 = st.tabs(["📈 Évolution temporelle", "🗺️ Comparaison régionale", "📊 Corrélations", "🎯 Prédictions vs Réalité"])
+
+    with tab1:
+        st.subheader("Évolution temporelle des prédictions")
+        
+        if data_type == "Prédictions Prophet" and data['predictions'] is not None:
+            df_pred = data['predictions']
+            
+            # Graphique temporel avec Prophet
+            fig_temp = go.Figure()
+            
+            # Ligne principale (yhat)
+            fig_temp.add_trace(go.Scatter(
+                x=df_pred['ds'],
+                y=df_pred['yhat'],
+                mode='lines',
+                name='Prédiction',
+                line=dict(color='blue', width=2)
+            ))
+            
+            # Intervalle de confiance
+            fig_temp.add_trace(go.Scatter(
+                x=df_pred['ds'],
+                y=df_pred['yhat_upper'],
+                mode='lines',
+                name='Intervalle supérieur',
+                line=dict(color='rgba(0,100,80,0.2)', width=0),
+                showlegend=False
+            ))
+            
+            fig_temp.add_trace(go.Scatter(
+                x=df_pred['ds'],
+                y=df_pred['yhat_lower'],
+                mode='lines',
+                name='Intervalle inférieur',
+                line=dict(color='rgba(0,100,80,0.2)', width=0),
+                fill='tonexty',
+                fillcolor='rgba(0,100,80,0.1)',
+                showlegend=False
+            ))
+            
+            # Composantes Prophet
+            if 'trend' in df_pred.columns:
+                fig_temp.add_trace(go.Scatter(
+                    x=df_pred['ds'],
+                    y=df_pred['trend'],
+                    mode='lines',
+                    name='Tendance',
+                    line=dict(color='red', dash='dash')
+                ))
+            
+            fig_temp.update_layout(
+                title="Prédictions Prophet - Évolution temporelle",
+                xaxis_title="Date",
+                yaxis_title="Prédiction",
+                height=500
+            )
+            
+            st.plotly_chart(fig_temp, use_container_width=True)
+            
+            # Métriques temporelles
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Prédiction actuelle", f"{df_pred['yhat'].iloc[-1]:,.0f}")
+            with col2:
+                st.metric("Tendance", f"{df_pred['trend'].iloc[-1]:,.0f}")
+            with col3:
+                if len(df_pred) >= 8:
+                    variation = ((df_pred['yhat'].iloc[-1] / df_pred['yhat'].iloc[-8]) - 1) * 100
+                    st.metric("Variation 7j", f"{variation:.1f}%")
+                else:
+                    st.metric("Variation 7j", "N/A")
+
+    with tab2:
+        st.subheader("Comparaison régionale")
+        
+        if not df_map.empty:
+            # Graphique en secteurs (top 5)
+            top_5 = df_map.nlargest(5, color_col)
+            fig_pie = px.pie(
+                top_5,
+                values=color_col,
+                names='region',
+                title="Top 5 régions (répartition)"
+            )
+            st.plotly_chart(fig_pie, use_container_width=True)
+
+    with tab3:
+        st.subheader("Analyse des corrélations")
+        
+        if data_type == "Données SurSaUD (grippe)" and data['sursaud'] is not None:
+            df_sursaud = data['sursaud']
+            
+            # Sélection des métriques à corréler
+            metrics = ['taux_urgences_grippe', 'taux_hospitalisations_grippe', 'taux_sos_medecins_grippe']
+            
+            # Matrice de corrélation
+            df_corr = df_sursaud[df_sursaud['classe_age'] == 'Tous âges'][metrics].corr()
+            
+            fig_corr = px.imshow(
+                df_corr,
+                text_auto=True,
+                aspect="auto",
+                title="Matrice de corrélation - Indicateurs SurSaUD",
+                color_continuous_scale="RdBu"
+            )
+            st.plotly_chart(fig_corr, use_container_width=True)
+            
+            # Graphique de dispersion
+            metric1 = st.selectbox("Métrique X", metrics, index=0)
+            metric2 = st.selectbox("Métrique Y", metrics, index=1)
+            
+            if metric1 != metric2:
+                fig_scatter = px.scatter(
+                    df_sursaud[df_sursaud['classe_age'] == 'Tous âges'],
+                    x=metric1,
+                    y=metric2,
+                    color='region',
+                    title=f"Corrélation {metric1} vs {metric2}",
+                    hover_data=['region', 'semaine']
+                )
+                st.plotly_chart(fig_scatter, use_container_width=True)
+
+    with tab4:
+        st.subheader("Prédictions vs Données historiques")
+        
+        if data_type == "Données IQVIA (vaccination)" and data['iqvia'] is not None:
+            df_iqvia = data['iqvia']
+            
+            # Agrégation par date
+            df_hist = df_iqvia.groupby('date')['valeur'].sum().reset_index()
+            
+            fig_comparison = go.Figure()
+            
+            # Données historiques
+            fig_comparison.add_trace(go.Scatter(
+                x=df_hist['date'],
+                y=df_hist['valeur'],
+                mode='lines+markers',
+                name='Données historiques IQVIA',
+                line=dict(color='green', width=2)
+            ))
+            
+            # Prédictions (si disponibles)
+            if data['predictions'] is not None:
+                df_pred = data['predictions']
+                fig_comparison.add_trace(go.Scatter(
+                    x=df_pred['ds'],
+                    y=df_pred['yhat'],
+                    mode='lines',
+                    name='Prédictions Prophet',
+                    line=dict(color='blue', width=2, dash='dash')
+                ))
+            
+            fig_comparison.update_layout(
+                title="Comparaison Prédictions vs Historique",
+                xaxis_title="Date",
+                yaxis_title="Nombre de doses",
+                height=500
+            )
+            
+            st.plotly_chart(fig_comparison, use_container_width=True)
+            
+            # Métriques de performance
+            if data['predictions'] is not None and not df_hist.empty:
+                st.subheader("Métriques de performance")
+                
+                # Trouver les dates communes
+                common_dates = pd.merge(df_hist, df_pred, left_on='date', right_on='ds', how='inner')
+                
+                if not common_dates.empty:
+                    mae = abs(common_dates['valeur'] - common_dates['yhat']).mean()
+                    mape = (abs(common_dates['valeur'] - common_dates['yhat']) / common_dates['valeur']).mean() * 100
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("MAE", f"{mae:,.0f}")
+                    with col2:
+                        st.metric("MAPE", f"{mape:.1f}%")
+                    with col3:
+                        st.metric("Corrélation", f"{common_dates['valeur'].corr(common_dates['yhat']):.3f}")
+
+    # ---------------------------
+    # Section Analyse avancée
+    # ---------------------------
+    st.markdown("---")
+    st.subheader("🔍 Analyse avancée")
+
+    # Sélecteur de région pour analyse détaillée
+    if not df_map.empty:
+        selected_region = st.selectbox("Sélectionner une région pour analyse détaillée", df_map['region'].unique())
+        
+        if selected_region:
+            st.subheader(f"Analyse détaillée - {selected_region}")
+            
+            # Données de la région sélectionnée
+            region_data = df_map[df_map['region'] == selected_region]
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Valeur actuelle", f"{region_data[color_col].iloc[0]:,.0f}")
+            with col2:
+                st.metric("Rang national", f"#{df_map[df_map[color_col] >= region_data[color_col].iloc[0]].shape[0]}")
+            with col3:
+                st.metric("Part du total", f"{(region_data[color_col].iloc[0] / df_map[color_col].sum()) * 100:.1f}%")
+            
+            # Graphique de tendance pour cette région (si données temporelles disponibles)
+            if data_type == "Données SurSaUD (grippe)" and data['sursaud'] is not None:
+                df_sursaud = data['sursaud']
+                region_ts = df_sursaud[df_sursaud['region'] == selected_region]
+                
+                if not region_ts.empty:
+                    fig_region = px.line(
+                        region_ts,
+                        x='semaine',
+                        y='taux_urgences_grippe',
+                        title=f"Évolution des urgences grippe - {selected_region}",
+                        markers=True
+                    )
+                    st.plotly_chart(fig_region, use_container_width=True)
+
+    # ---------------------------
+    # Section Export et téléchargement
+    # ---------------------------
+    st.markdown("---")
+    st.subheader("📥 Export des analyses")
+
+    # Export des graphiques
+    if st.button("📊 Exporter les graphiques"):
+        # Créer un fichier HTML avec tous les graphiques
+        html_content = f"""
+        <html>
+        <head><title>Analyse Vaccination Grippe - {datetime.now().strftime('%Y-%m-%d')}</title></head>
+        <body>
+            <h1>Rapport d'analyse - {title_suffix}</h1>
+            <p>Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')}</p>
+            <h2>Données par région</h2>
+            {df_map.to_html(index=False)}
+        </body>
+        </html>
+        """
+        
+        st.download_button(
+            label="📄 Télécharger le rapport HTML",
+            data=html_content.encode('utf-8'),
+            file_name=f"rapport_vaccination_{datetime.now().strftime('%Y%m%d_%H%M')}.html",
+            mime="text/html"
+        )
+
+    # Export des données brutes
+    csv_data = df_map.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="📊 Télécharger les données CSV",
+        data=csv_data,
+        file_name=f"donnees_vaccination_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv"
+    )
+
 else:
     st.warning("Aucune donnée disponible pour la visualisation.")
 
@@ -299,15 +568,3 @@ with st.expander("ℹ️ Informations sur les données"):
     - Les données SurSaUD sont agrégées par région et classe d'âge
     - Les données IQVIA sont sommées par campagne et groupe d'âge
     """)
-
-# ---------------------------
-# Export des données
-# ---------------------------
-if not df_map.empty:
-    csv = df_map.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="📥 Télécharger les données (CSV)",
-        data=csv,
-        file_name=f"heatmap_vaccination_{datetime.now().strftime('%Y%m%d')}.csv",
-        mime="text/csv"
-    )
