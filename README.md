@@ -68,7 +68,7 @@ Ces agents **évaluent localement** leurs variables, puis **échangent leurs sig
 
 > chaque agent communique des “alertes contextuelles” aux autres (ex. _hausse grippe_ → _alerte logistique_).
 
-🧩 **Objectif :** construire une **intelligence collective distribuée** — pas un modèle unique, mais un ensemble d’experts autonomes qui s’influencent.
+ **Objectif :** construire une **intelligence collective distribuée** — pas un modèle unique, mais un ensemble d’experts autonomes qui s’influencent.
 
 # A2A — Agent-to-Agent Communication
 Les agents communiquent entre eux pour former une vision cohérente de la situation sanitaire.
@@ -92,7 +92,7 @@ DecisionAgent → alerte “tension régionale”
 
 ```
 +-----------------------------------------------------+
-|                🧩 ETL / Data Ingestion               |
+|                 ETL / Data Ingestion               |
 |-----------------------------------------------------|
 | Sources : INSEE, SPF, IQVIA, Météo France, IAS®     |
 | • Extraction automatique via API / CSV              |
@@ -101,7 +101,7 @@ DecisionAgent → alerte “tension régionale”
 +-----------------------------------------------------+
                               ↓
 +-----------------------------------------------------+
-|              🧮 ML Predictive Models                |
+|               ML Predictive Models                |
 |-----------------------------------------------------|
 | - Prophet : tendance temporelle (prévision grippe)  |
 | - XGBoost : corrélations multi-facteurs             |
@@ -111,7 +111,7 @@ DecisionAgent → alerte “tension régionale”
 +-----------------------------------------------------+
                               ↓
 +-----------------------------------------------------+
-|             📊 Visualization & Intelligence          |
+|              Visualization & Intelligence          |
 |-----------------------------------------------------|
 | - Carte interactive France (Folium / Plotly)        |
 | - Heatmaps : prévisions régionales de tension       |
@@ -282,9 +282,9 @@ import requests
 | **Catégorie**                          | **Source**                    | **Variables clés**                                     | **Rôle dans le modèle**                                    |
 | -------------------------------------- | ----------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
 | 💉 **Activité vaccinale**              | **IQVIA – doses & actes**     | date, région, groupe d’âge, nombre_actes, nombre_doses | Série temporelle de la vaccination → variable _à prédire_  |
-| 🧓 **Ciblage population à risque**     | **INSEE / Assurance Maladie** | population_65+, part_ALD, densité_médicale             | Poids des groupes à risque → ajustement de la demande      |
-| 🏥 **Couverture vaccinale historique** | **ODISSE / SPF**              | taux_couverture, campagne, région                      | Niveau d’immunisation → inertie / saturation de la demande |
-| 🕒 **Calendrier de campagne**          | **Santé Publique France**     | date_début, date_fin, semaine_campagne                 | Cadre temporel des pics de vaccination                     |
+|  **Ciblage population à risque**     | **INSEE / Assurance Maladie** | population_65+, part_ALD, densité_médicale             | Poids des groupes à risque → ajustement de la demande      |
+|  **Couverture vaccinale historique** | **ODISSE / SPF**              | taux_couverture, campagne, région                      | Niveau d’immunisation → inertie / saturation de la demande |
+|  **Calendrier de campagne**          | **Santé Publique France**     | date_début, date_fin, semaine_campagne                 | Cadre temporel des pics de vaccination                     |
 Ces données permettent de **modéliser la demande vaccinale passée et future**.
 Tu peux déjà bâtir un **modèle Prophet ou XGBoost** solide rien qu’avec ces quatre blocs.
 
@@ -295,11 +295,11 @@ mais elles **corrèlent fortement** avec la dynamique des épidémies et des cam
 
 | **Catégorie**                                 | **Source**                     | **Variables clés**                               | **Utilité**                                                        |
 | --------------------------------------------- | ------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------ |
-| 🦠 **Indicateurs sanitaires (IAS / SurSaUD)** | Santé Publique France          | taux_urgence_grippe, taux_SOS_Médecins, IAS_taux | Signal épidémique : détecte les pics de grippe                     |
-| 🌦️ **Conditions climatiques**                | Météo France                   | température_moyenne, humidité, pluie, vent       | Le froid et l’humidité favorisent les virus respiratoires          |
-| 🚶 **Mobilité et comportements**              | Google Mobility / SNCF / INSEE | flux_transport, mobilité_régionale               | Influence la diffusion du virus et la fréquentation des pharmacies |
-| 💊 **Disponibilité en pharmacie**             | IQVIA (distribution)           | stock_disponible, livraisons                     | Détermine la contrainte d’approvisionnement                        |
-| 🧍 **Densité médicale et officinale**         | DREES / INSEE                  | nb_pharmacies_par_habitant, nb_médecins          |                                                                    |
+|  **Indicateurs sanitaires (IAS / SurSaUD)** | Santé Publique France          | taux_urgence_grippe, taux_SOS_Médecins, IAS_taux | Signal épidémique : détecte les pics de grippe                     |
+|  **Conditions climatiques**                | Météo France                   | température_moyenne, humidité, pluie, vent       | Le froid et l’humidité favorisent les virus respiratoires          |
+|  **Mobilité et comportements**              | Google Mobility / SNCF / INSEE | flux_transport, mobilité_régionale               | Influence la diffusion du virus et la fréquentation des pharmacies |
+|  **Disponibilité en pharmacie**             | IQVIA (distribution)           | stock_disponible, livraisons                     | Détermine la contrainte d’approvisionnement                        |
+|  **Densité médicale et officinale**         | DREES / INSEE                  | nb_pharmacies_par_habitant, nb_médecins          |                                                                    |
 Ces variables permettent d’expliquer **les fluctuations régionales** ou **les anomalies locales** dans la vaccination.
 
 
@@ -308,9 +308,9 @@ Ces variables permettent d’expliquer **les fluctuations régionales** ou **les
 
 | **Catégorie**                     | **Source**                    | **Variables clés**                             | **Utilité**                                            |
 | --------------------------------- | ----------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
-| 🗺️ **Région / Département**      | INSEE / SPF                   | code_region, densité_population, revenu_médian | Conditions locales d’accès et comportements sanitaires |
-| 🚗 **Accessibilité géographique** | INSEE / IGN                   | distance_moyenne_officine, temps_accès_soin    | Mesure les “déserts vaccinaux”                         |
-| 👩‍⚕️ **Professionnels de santé** | DREES / Ordre des pharmaciens | nb_infirmiers, nb_pharmaciens, nb_médecins     | Capacité opérationnelle de vaccination                 |
+|  **Région / Département**      | INSEE / SPF                   | code_region, densité_population, revenu_médian | Conditions locales d’accès et comportements sanitaires |
+|  **Accessibilité géographique** | INSEE / IGN                   | distance_moyenne_officine, temps_accès_soin    | Mesure les “déserts vaccinaux”                         |
+|  **Professionnels de santé** | DREES / Ordre des pharmaciens | nb_infirmiers, nb_pharmaciens, nb_médecins     | Capacité opérationnelle de vaccination                 |
 
 
 | **Objectif**                                        | **Description**                                             | **Type de modèle** |
