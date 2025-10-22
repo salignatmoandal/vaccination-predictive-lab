@@ -362,3 +362,9 @@ Ces variables permettent d’expliquer **les fluctuations régionales** ou **les
 |**Anomaly detection**|Écart entre prévu et observé|Alerte rupture / sous-performance|
 
 
+<img width="1853" height="1189" alt="evolution-urgence" src="https://github.com/user-attachments/assets/e4294416-0b2e-49be-9336-07ab297228ca" />
+<img width="1583" height="1190" alt="evolution-region" src="https://github.com/user-attachments/assets/5f94c3d7-982a-43f4-92b6-3d0d54cf00dc" />
+<img width="1589" height="1190" alt="evolution-grippe" src="https://github.com/user-attachments/assets/140fc1dd-4543-4b82-a415-48a400322851" />
+<img width="1590" height="1189" alt="departement" src="https://github.com/user-attachments/assets/ee8575d3-5bfa-4c32-b5f4-16e8162f5f65" />
+
+
