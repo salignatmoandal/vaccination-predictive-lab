@@ -368,3 +368,92 @@ Ces variables permettent d’expliquer **les fluctuations régionales** ou **les
 <img width="1590" height="1189" alt="departement" src="https://github.com/user-attachments/assets/ee8575d3-5bfa-4c32-b5f4-16e8162f5f65" />
 
 
+# Installation et Lancement
+
+## Prérequis
+- Python 3.8+ 
+- [uv](https://docs.astral.sh/uv/) (gestionnaire de paquets Python moderne)
+
+## Installation de uv
+
+### Sur macOS/Linux
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Sur Windows
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+### Alternative avec pip
+```bash
+pip install uv
+```
+
+## Installation du projet
+
+1. **Cloner le repository**
+```bash
+git clone <votre-repo-url>
+cd vaccination-predictive-lab
+```
+
+2. **Installer les dépendances avec uv**
+```bash
+uv sync
+```
+
+Cette commande va :
+- Créer un environnement virtuel automatiquement
+- Installer toutes les dépendances listées dans `pyproject.toml`
+- Inclure Streamlit et toutes les librairies nécessaires
+
+## Lancement de l'application Streamlit
+
+```bash
+uv run streamlit run app.py
+```
+
+L'application sera accessible sur : http://localhost:8501
+
+## Commandes utiles
+
+### Voir les dépendances installées
+```bash
+uv pip list
+```
+
+### Ajouter une nouvelle dépendance
+```bash
+uv add nom-du-package
+```
+
+### Mettre à jour les dépendances
+```bash
+uv sync --upgrade
+```
+
+### Activer l'environnement virtuel manuellement (optionnel)
+```bash
+source .venv/bin/activate  # Linux/macOS
+# ou
+.venv\Scripts\activate    # Windows
+```
+
+## Structure des données
+
+L'application utilise les fichiers suivants (doivent être présents dans le dossier `data/`) :
+
+- `data/cleaned/sursaud_regional_cleaned.csv` - Données SurSaUD régionales
+- `data/cleaned/iqvia_doses_cleaned.csv` - Données IQVIA vaccination  
+- `data/processed/predictions_2026_2027.csv` - Prédictions Prophet
+- `data/processed/predictions_2027_2028.csv` - Prédictions futures
+- `data/processed/predictions_stables_2026_2028.csv` - Prédictions stables
+
+## Fonctionnalités de l'app
+
+- 🗺️ **Carte choroplèthe de France** avec visualisation des données par région
+- 📊 **4 types de visualisation** : Prédictions Prophet, SurSaUD, IQVIA, données mockées
+- ⚙️ **Paramètres interactifs** : sélection de dates, métriques, groupes d'âge
+- 📈 **Analyses** : métriques clés
